@@ -35,7 +35,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          echo ${{ matrix.dockerfile }} > Dockerfile
+          echo "${{ matrix.dockerfile }}" > Dockerfile
           docker build --tag mateusoliveira43/poetry:${{ matrix.version }} - < Dockerfile
 
       - name: Push Docker image
