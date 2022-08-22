@@ -1,0 +1,59 @@
+name: Continuos Integration
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron:  '0 0 * * 1' # Every Monday at 00:00 UTC
+
+jobs:
+  project-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check if Dockerfiles were generated
+        run: |
+          ./generate_dockerfiles.py
+          test -z "$(git status --short)"
+
+  generate-docker-jobs:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.generate-jobs.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Generate jobs
+        id: generate-jobs
+        run: |
+          matrix=$(./generate_ci_jobs.py)
+          echo "::set-output name=matrix::$matrix"
+
+  docker-check:
+    needs: generate-docker-jobs
+    strategy:
+      matrix: ${{ fromJson(needs.generate-docker-jobs.outputs.matrix) }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: docker build --tag poetry:${{ matrix.version }} - < ${{ matrix.dockerfile }}
+
+      - name: Dockerfile linter
+        uses: hadolint/hadolint-action@v2.0.0
+        with:
+          dockerfile: ${{ matrix.dockerfile }}
+
+      - name: Docker image security vulnerability scan
+        uses: snyk/actions/docker@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: poetry:${{ matrix.version }}
+          args: --severity-threshold=medium --file=${{ matrix.dockerfile }}

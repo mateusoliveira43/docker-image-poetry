@@ -1,0 +1,14 @@
+name: Continuos Delivery
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  pull-docker-image:
+    runs-on: ubuntu-latest
+    steps:
+      - TODO
+      - build
+      - pull
