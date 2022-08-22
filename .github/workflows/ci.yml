@@ -35,7 +35,7 @@ jobs:
           echo "::set-output name=matrix::$matrix"
 
   docker-check:
-    needs: generate-docker-jobs
+    needs: [project-check, generate-docker-jobs]
     strategy:
       matrix: ${{ fromJson(needs.generate-docker-jobs.outputs.matrix) }}
     runs-on: ubuntu-latest
