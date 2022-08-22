@@ -15,7 +15,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     POETRY_HOME=/usr/bin/poetry \
     PATH=/usr/bin/poetry/bin:$PATH
 
-# WORKDIR /
+WORKDIR /
 COPY --from=install-poetry ./install-poetry.py ./
 RUN python ./install-poetry.py \
     && rm ./install-poetry.py

@@ -36,6 +36,7 @@ jobs:
 
   docker-check:
     needs: [project-check, generate-docker-jobs]
+    continue-on-error: true
     strategy:
       matrix: ${{ fromJson(needs.generate-docker-jobs.outputs.matrix) }}
     runs-on: ubuntu-latest
@@ -51,7 +52,6 @@ jobs:
           dockerfile: ${{ matrix.dockerfile }}
 
       - name: Docker image security vulnerability scan
-        continue-on-error: true
         uses: snyk/actions/docker@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
