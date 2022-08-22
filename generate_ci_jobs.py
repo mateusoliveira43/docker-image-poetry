@@ -13,9 +13,8 @@ from config import (
 jobs = [
     {
         "dockerfile": (
-            PROJECT_ROOT
-            / f"{poetry_minor}/python{python_minor}-{variation}/Dockerfile"
-        ).as_posix(),
+            f"{poetry_minor}/python{python_minor}-{variation}/Dockerfile"
+        ),
         "version": (
             f"{get_dockerfile_version(poetry_minor, POETRY_VERSIONS)}-python"
             f"{get_dockerfile_version(python_minor, PYTHON_VERSIONS)}-{variation}"
