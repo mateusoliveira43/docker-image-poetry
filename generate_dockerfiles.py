@@ -7,6 +7,7 @@ from config import (
     PROJECT_ROOT,
     PYTHON_VARIATIONS,
     PYTHON_VERSIONS,
+    get_dockerfile_data,
     get_dockerfile_version,
 )
 
@@ -25,16 +26,17 @@ for poetry_minor in POETRY_VERSIONS:
                 dockerfile_path,
             )
 
-            with open(dockerfile_path, mode='r', encoding='utf-8') as file:
-                final_data = file.read().replace(
-                    "{{PYTHON_VERSION}}",
-                    get_dockerfile_version(python_minor, PYTHON_VERSIONS),
-                ).replace(
-                    "{{POETRY_VERSION}}",
-                    get_dockerfile_version(poetry_minor, POETRY_VERSIONS),
-                )
+            dockerfile_data = get_dockerfile_data(
+                dockerfile_path=dockerfile_path,
+                python_version=get_dockerfile_version(
+                    python_minor, PYTHON_VERSIONS
+                ),
+                poetry_version=get_dockerfile_version(
+                    poetry_minor, POETRY_VERSIONS
+                ),
+            )
 
             with open(dockerfile_path, mode='w', encoding='utf-8') as file:
-                file.write(final_data)
+                file.write(dockerfile_data)
 
 print("Dockerfiles generated successfully!")

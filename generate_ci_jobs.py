@@ -4,7 +4,6 @@ import json
 
 from config import (
     POETRY_VERSIONS,
-    PROJECT_ROOT,
     PYTHON_VARIATIONS,
     PYTHON_VERSIONS,
     get_dockerfile_version,

@@ -6,9 +6,36 @@ on:
       - main
 
 jobs:
-  pull-docker-image:
+  generate-jobs:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.generate-jobs.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Generate jobs
+        id: generate-jobs
+        run: |
+          matrix=$(./generate_cd_jobs.py)
+          echo "::set-output name=matrix::$matrix"
+
+  docker-hub:
+    needs: generate-jobs
+    strategy:
+      matrix: ${{ fromJson(needs.generate-jobs.outputs.matrix) }}
     runs-on: ubuntu-latest
     steps:
-      - TODO
-      - build
-      - pull
+      - uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: ${{ matrix.dockerfile }} | docker build --tag ${{ secrets.DOCKERHUB_USERNAME }}/poetry:${{ matrix.version }} -
+
+      - name: Push Docker image
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/poetry:${{ matrix.version }}
+

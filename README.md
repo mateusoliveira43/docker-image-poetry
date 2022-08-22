@@ -2,7 +2,7 @@
 
 Docker Image with [Poetry](https://python-poetry.org/).
 
-Docker Hub repository...
+[Docker Hub repository](https://hub.docker.com/r/mateusoliveira43/poetry).
 
 Project structure based in the [Docker Official Image packaging for Python repository](https://github.com/docker-library/python).
 
@@ -22,3 +22,8 @@ To connect to the Container's shell, run
 docker container run -ti --rm poetry
 ```
 To exit the container's shell, run `CTRL+D` or `exit`.
+
+To use it in a Dockerfile, add
+```dockerfile
+FROM mateusoliveira43/poetry
+```
