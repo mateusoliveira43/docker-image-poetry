@@ -21,6 +21,10 @@ jobs:
           ./generate_dockerfiles.py
           test -z "$(git status --short)"
 
+      - run: |
+          echo mateusoliveira43/poetry:1.1
+          echo "mateusoliveira43/poetry:1.1"
+
   generate-docker-jobs:
     runs-on: ubuntu-latest
     outputs:
