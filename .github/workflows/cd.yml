@@ -34,7 +34,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build Docker image
-        run: ${{ matrix.dockerfile }} | docker build --tag ${{ secrets.DOCKERHUB_USERNAME }}/poetry:${{ matrix.version }} -
+        run: docker build --tag ${{ secrets.DOCKERHUB_USERNAME }}/poetry:${{ matrix.version }} - <<< ${{ matrix.dockerfile }}
 
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/poetry:${{ matrix.version }}
