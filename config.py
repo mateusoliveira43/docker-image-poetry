@@ -21,7 +21,7 @@ def get_dockerfile_version(
 def get_dockerfile_data(
     dockerfile_path: Path,
     python_version: str,
-    poetry_version: str
+    poetry_version: str,
 ) -> str:
     with open(dockerfile_path, mode='r', encoding='utf-8') as file:
         final_data = file.read().replace(
