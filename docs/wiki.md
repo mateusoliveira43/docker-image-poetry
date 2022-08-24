@@ -1,0 +1,162 @@
+# Wiki
+
+- [Repository's README](../README.md)
+
+## Motivation
+
+In all my personal Python projects I use Poetry, and I always like to build a Docker development environment. So, to keep the DRY (Don't Repeat Yourself) principle when writing Dockerfiles, I created this repository.
+
+## What is Docker?
+
+[Docker](https://docs.docker.com/get-started/overview/) is a tool for **building** and **sharing** **Containers**.
+
+### What is a Container?
+
+A Container is an application packaging (it's code and dependencies), that can run **independent** of the environment or host machine.
+
+### How that works?
+
+Let's check out how this looks for three scenarios:
+- an application running natively in the host machine
+- an application running in a Docker Container in the host machine
+- an application running in a Virtual Machine in the host machine
+
+![Representation of host machine running a native, Docker and Virtual Machine app](host_machine.svg "Representation of host machine running a native, Docker and Virtual Machine app")
+
+> Hypervisor is a software that creates and runs Virtual Machines.
+
+Now let's see the same scenario but with more applications.
+
+![Representation of host machine running maximum number of native, Docker and Virtual Machine apps](host_machine_full.svg "Representation of host machine running maximum number of native, Docker and Virtual Machine apps")
+
+Containers share the **Kernel** (Linux) of the host machine. Virtual Machines need to emulate a new Operational System.
+
+### What is an Image?
+
+An image are the **Read Only** **Layers** of a Container.
+
+### What are Layers?
+
+Layers are the instructions for creating and running a Container. Only the running Layer (the last one) can be modified.
+
+![Layers of a Docker Container](layers.svg "Layers of a Docker Container")
+
+### Running Docker
+
+![Running Container](run_container.gif "Running Container")
+
+The command `docker container run -ti --rm mateusoliveira43/poetry` was run in the host machine.
+
+Since the Image was not built, it was built before running the Container.
+
+To build an Image, run
+```
+docker image pull <user>/<repo>
+```
+
+To run a Container, run
+```
+docker container run <user>/<repo>
+```
+
+To push an Image to [Docker Hub](https://hub.docker.com/), run
+```
+docker login
+docker image push <user>/<repo>:<tag>
+docker logout
+```
+
+## What is Poetry?
+
+TODO
+
+## Using Poetry and Docker for development
+
+To start using Docker and Docker Compose for developing a Python project with Poetry, you need to:
+- Create a folder called `docker` in the project's root, and add two files in it:
+    - one called `Dockerfile`.
+    - the other called `compose.yaml`.
+- Create a `.env` file in the project's root.
+
+The project's root should look like this.
+```
+.
+├── docker
+│   ├── compose.yaml
+│   └── Dockerfile
+├── poetry.lock
+├── pyproject.toml
+└── project_name
+    └── ...
+```
+
+Add the `Dockerfile` content:
+```dockerfile
+FROM mateusoliveira43/poetry:latest
+
+ARG GROUP_ID=1000
+ARG USER_ID=1000
+ARG USER_NAME=develop
+ARG WORK_DIR=/home/$USER_NAME/PROJECT
+
+RUN groupadd --gid $GROUP_ID $USER_NAME \
+    && useradd --uid $USER_ID --gid $GROUP_ID --create-home $USER_NAME \
+    && runuser --user $USER_NAME -- mkdir $WORK_DIR
+USER $USER_NAME
+
+WORKDIR $WORK_DIR
+COPY pyproject.toml poetry.lock ./
+RUN poetry install
+```
+
+Add the `compose.yaml` content:
+```yaml
+services:
+  service-name:
+    image: ${SERVICE_NAME}
+    container_name: ${SERVICE_NAME}
+    hostname: docker
+    entrypoint: ["poetry", "run"]
+    command: ["/bin/bash"]
+    build:
+      context: ./
+      dockerfile: ./docker/Dockerfile
+      args:
+        GROUP_ID: ${GROUP_ID}
+        USER_ID: ${USER_ID}
+        USER_NAME: ${USER_NAME}
+        WORK_DIR: ${WORK_DIR}
+    volumes:
+      - type: bind
+        source: ./
+        target: ${WORK_DIR}/
+      - type: volume
+        source: virtual-environment
+        target: ${WORK_DIR}/.venv/
+
+volumes:
+  virtual-environment:
+```
+
+Add the `.env` content:
+```
+GROUP_ID=1000
+USER_ID=1000
+USER_NAME=develop
+SERVICE_NAME=service-name
+WORK_DIR=/home/develop/service-name
+```
+
+And then, in the project's root, run
+```
+docker-compose --file docker/compose.yaml --project-directory ./ run --rm <service-name>
+```
+to connect to container's shell and run all commands needed for development there. To exit the container's shell, run `CTRL+D` or `exit`.
+
+Or check out [Docky](https://github.com/mateusoliveira43/docky), a CLI for running Docker and Docker Compose with ease.
+
+## References :books:
+
+- https://github.com/badtuxx/DescomplicandoDocker
+- https://www.youtube.com/playlist?list=PLf-O3X2-mxDn1VpyU2q3fuI6YYeIWp5rR
+- https://docs.docker.com/
