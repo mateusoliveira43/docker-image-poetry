@@ -37,7 +37,6 @@ jobs:
       #     password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build Docker image
-        # docker build --no-cache ${{ matrix.tags }} - <<< "${{ matrix.dockerfile }}"
         run: |
           docker build -t poetry - <<< "${{ matrix.dockerfile }}"
           docker image history poetry
