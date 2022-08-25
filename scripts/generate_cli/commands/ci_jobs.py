@@ -1,8 +1,6 @@
-#!/usr/bin/env python3
-
 import json
 
-from config import (
+from ..config import (
     POETRY_VERSIONS,
     PYTHON_VARIATIONS,
     PYTHON_VERSIONS,
@@ -24,4 +22,6 @@ jobs = [
     for variation in PYTHON_VARIATIONS
 ]
 
-print(json.dumps({"include": jobs}))
+def generate_ci_jobs() -> None:
+    """Generate jobs for the Continuos Integration pipeline."""
+    print(json.dumps({"include": jobs}))

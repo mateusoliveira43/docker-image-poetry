@@ -45,9 +45,7 @@ Layers are the instructions for creating and running a Container. Only the runni
 
 ![Running Container](run_container.gif "Running Container")
 
-The command `docker container run -ti --rm mateusoliveira43/poetry` was run in the host machine.
-
-Since the Image was not built, it was built before running the Container.
+The command `docker container run -ti --rm mateusoliveira43/poetry` was run in the host machine. Since the Image was not built, it was built before running the Container. Then, inside the Container, the command `poetry --version` was run.
 
 To build an Image, run
 ```
@@ -68,7 +66,29 @@ docker logout
 
 ## What is Poetry?
 
-TODO
+[Poetry](https://python-poetry.org/) is a tool for **dependency management** and packaging in Python.
+
+### How that works?
+
+Poetry can be used to create reproducible environments, because it pins the versions of the libraries the project uses, with the `pyproject.toml` and `poetry.lock` files.
+
+It can also be used to install only production dependencies and create the usual `requirements.txt` file, so that the project does not depends in Poetry to run.
+
+### Running Poetry
+
+![Running Poetry](run_poetry.gif "Running Poetry")
+
+The following commands were run, in the following order
+1. `docker container run -ti --rm mateusoliveira43/poetry` to connect to Container's shell.
+1. `poetry new examplemon` to create a new project structure.
+1. `cd examplemon`
+1. `ls -1a`
+1. `poetry install` to install the project's dependencies in a virtual environment.
+1. `poetry add -D pytest@latest` to update pytest.
+1. `poetry shell` to activate the project's virtual environment.
+1. `pytest`
+1. `CTRL+D` to deactivate the project's virtual environment.
+1. `CTRL+D` to exit the Container's shell.
 
 ## Using Poetry and Docker for development
 
