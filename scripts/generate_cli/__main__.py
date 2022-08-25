@@ -1,6 +1,7 @@
 from cly import config
 
 from . import __version__
+from .commands.cd_dockerfile import generate_cd_dockerfile
 from .commands.cd_jobs import generate_cd_jobs
 from .commands.ci_jobs import generate_ci_jobs
 from .commands.dockerfiles import generate_dockerfiles
@@ -20,3 +21,5 @@ CLI = config.ConfiguredParser(CLI_CONFIG)
 CLI.create_command(generate_dockerfiles, alias="dockerfiles")
 CLI.create_command(generate_ci_jobs, alias="ci")
 CLI.create_command(generate_cd_jobs, alias="cd")
+cd_dockerfile_command = CLI.create_command(generate_cd_dockerfile, alias="cd_dockerfile")
+cd_dockerfile_command.add_argument("-v", "--version", metavar="str", type=str)

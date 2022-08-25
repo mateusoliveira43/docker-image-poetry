@@ -35,8 +35,8 @@ jobs:
 
       - name: Build Docker image
         run: |
-          echo "${{ matrix.dockerfile }}" > Dockerfile
-          docker build --no-cache ${{ matrix.tags }} - < Dockerfile
+          docker build --no-cache ${{ matrix.tags }} - <<< $(./scripts/generate.py cd_dockerfile -v ${{ matrix.version }})
+
 
       - name: Push Docker image
         run: docker push --all-tags mateusoliveira43/poetry

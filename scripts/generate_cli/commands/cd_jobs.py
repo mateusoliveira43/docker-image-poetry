@@ -5,8 +5,6 @@ from ..config import (
     POETRY_VERSIONS,
     PYTHON_VARIATIONS,
     PYTHON_VERSIONS,
-    TEMPLATE_FOLDER,
-    get_dockerfile_data,
     get_dockerfile_version,
 )
 
@@ -53,11 +51,6 @@ def get_tags(
 
 jobs = [
     {
-        "dockerfile": get_dockerfile_data(
-            dockerfile_path=TEMPLATE_FOLDER / f"Dockerfile-{variation}.template",
-            python_version=f"{python_minor}.{python_patch}",
-            poetry_version=f"{poetry_minor}.{poetry_patch}",
-        ),
         "version": (
             f"{poetry_minor}.{poetry_patch}-python"
             f"{python_minor}.{python_patch}-{variation}"
