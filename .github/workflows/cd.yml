@@ -39,7 +39,7 @@ jobs:
       - name: Build Docker image
         run: |
           docker build --no-cache ${{ matrix.tags }} - <<< $(./scripts/generate.py cd_dockerfile -v ${{ matrix.version }})
-          docker image history ateusoliveira43/poetry
+          docker image history mateusoliveira43/poetry
 
 
       # - name: Push Docker image
