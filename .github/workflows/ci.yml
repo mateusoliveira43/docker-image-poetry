@@ -18,7 +18,7 @@ jobs:
 
       - name: Check if Dockerfiles were generated
         run: |
-          ./generate_dockerfiles.py
+          ./scripts/generate.py dockerfiles
           test -z "$(git status --short)"
 
   generate-docker-jobs:
@@ -31,7 +31,7 @@ jobs:
       - name: Generate jobs
         id: generate-jobs
         run: |
-          matrix=$(./generate_ci_jobs.py)
+          matrix=$(./scripts/generate.py ci)
           echo "::set-output name=matrix::$matrix"
 
   docker-check:

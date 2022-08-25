@@ -15,4 +15,4 @@ RUN curl -sSL https://install.python-poetry.org > ./install-poetry.py \
     && python ./install-poetry.py \
     && rm ./install-poetry.py
 
-CMD [ "/bin/bash" ]
+CMD ["/bin/bash"]

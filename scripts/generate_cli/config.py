@@ -8,7 +8,8 @@ PYTHON_VARIATIONS: Dict[str, List[str]] = {
     "slim-bullseye": ["-slim", "-slim-bullseye"],
 }
 
-PROJECT_ROOT: Path = Path(__file__).resolve().parent
+PROJECT_ROOT: Path = Path(__file__).resolve().parent.parent.parent
+TEMPLATE_FOLDER: Path = PROJECT_ROOT / "templates"
 
 
 def get_dockerfile_version(

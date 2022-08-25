@@ -20,4 +20,4 @@ COPY --from=install-poetry ./install-poetry.py ./
 RUN python ./install-poetry.py \
     && rm ./install-poetry.py
 
-CMD [ "/bin/bash" ]
+CMD ["/bin/bash"]
