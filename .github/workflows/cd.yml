@@ -39,5 +39,5 @@ jobs:
           docker build --no-cache ${{ matrix.tags }} - < Dockerfile
 
       - name: Push Docker image
-        run: docker push --all-tags mateusoliveira43/poetry:${{ matrix.version }}
+        run: docker push --all-tags mateusoliveira43/poetry
 
