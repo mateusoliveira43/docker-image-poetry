@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
   generate-jobs:
@@ -30,18 +27,17 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # - name: Login to Docker Hub
-      #   uses: docker/login-action@v2
-      #   with:
-      #     username: mateusoliveira43
-      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: mateusoliveira43
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build Docker image
         run: |
           docker build --no-cache ${{ matrix.tags }} - <<< $(./scripts/generate.py cd_dockerfile -v ${{ matrix.version }})
-          docker image history mateusoliveira43/poetry
 
 
-      # - name: Push Docker image
-      #   run: docker push --all-tags mateusoliveira43/poetry
+      - name: Push Docker image
+        run: docker push --all-tags mateusoliveira43/poetry
 
