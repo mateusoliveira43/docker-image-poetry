@@ -12,9 +12,7 @@ In all my personal Python projects I use Poetry, and I always like to build a Do
 
 ### What is a Container?
 
-A Container is an application packaging (it's code and dependencies), that can run **independent** of the environment or host machine.
-
-A Container is a runnable instance of an **Image**.
+A Container is a runnable instance of an **Image**. It is an application packaging (it's code and dependencies), that can run **independent** of the environment or host machine.
 
 ### What is an Image?
 
@@ -22,7 +20,7 @@ An image is the set of **Read Only** **Layers** of a Container.
 
 ### What is a Layer?
 
-A Layer is a instruction for creating and running a Container.
+A Layer is a instruction for creating or running a Container.
 
 ### How that works?
 
