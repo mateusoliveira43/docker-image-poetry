@@ -22,7 +22,7 @@ An image are the **Read Only** **Layers** of a Container.
 
 ### What are Layers?
 
-Layers are the instructions for creating and running a Container. Only the running Layer (the last one) can be modified.
+Layers are the instructions for creating and running a Container.
 
 ### How that works?
 
@@ -40,6 +40,8 @@ Containers share the **Kernel** (Linux) of the host machine. Virtual Machines ne
 If we zoom in the the APP running in the Docker Container, we would see something like this
 
 ![Layers of a Docker Container](layers.svg "Layers of a Docker Container")
+
+Only the running Layer (the last one) can be modified.
 
 ### Running Docker
 
