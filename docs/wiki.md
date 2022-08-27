@@ -12,7 +12,15 @@ In all my personal Python projects I use Poetry, and I always like to build a Do
 
 ### What is a Container?
 
-A Container is an application packaging (it's code and dependencies), that can run **independent** of the environment or host machine.
+A Container is a runnable instance of an **Image**. It is an application packaging (it's code and dependencies), that can run **independent** of the environment or host machine.
+
+### What is an Image?
+
+An image is the set of **Read Only** **Layers** of a Container.
+
+### What is a Layer?
+
+A Layer is a instruction for creating or running a Container.
 
 ### How that works?
 
@@ -25,21 +33,13 @@ Let's check out how this looks for three scenarios:
 
 > Hypervisor is a software that creates and runs Virtual Machines.
 
-Now let's see the same scenario but with more applications.
-
-![Representation of host machine running maximum number of native, Docker and Virtual Machine apps](host_machine_full.svg "Representation of host machine running maximum number of native, Docker and Virtual Machine apps")
-
 Containers share the **Kernel** (Linux) of the host machine. Virtual Machines need to emulate a new Operational System.
 
-### What is an Image?
-
-An image are the **Read Only** **Layers** of a Container.
-
-### What are Layers?
-
-Layers are the instructions for creating and running a Container. Only the running Layer (the last one) can be modified.
+If we zoom in the the APP running in the Docker Container, we would see something like this
 
 ![Layers of a Docker Container](layers.svg "Layers of a Docker Container")
+
+Only the running Layer (the last one) can be modified.
 
 ### Running Docker
 
@@ -93,10 +93,10 @@ The following commands were run, in the following order
 ## Using Poetry and Docker for development
 
 To start using Docker and Docker Compose for developing a Python project with Poetry, you need to:
+- Create a `.env` file in the project's root.
 - Create a folder called `docker` in the project's root, and add two files in it:
     - one called `Dockerfile`.
     - the other called `compose.yaml`.
-- Create a `.env` file in the project's root.
 
 The project's root should look like this.
 ```
@@ -108,6 +108,15 @@ The project's root should look like this.
 ├── pyproject.toml
 └── project_name
     └── ...
+```
+
+Add the `.env` content:
+```
+GROUP_ID=1000
+USER_ID=1000
+USER_NAME=develop
+SERVICE_NAME=service-name
+WORK_DIR=/home/develop/service-name
 ```
 
 Add the `Dockerfile` content:
@@ -158,16 +167,29 @@ volumes:
   virtual-environment:
 ```
 
-Add the `.env` content:
-```
-GROUP_ID=1000
-USER_ID=1000
-USER_NAME=develop
-SERVICE_NAME=service-name
-WORK_DIR=/home/develop/service-name
-```
+### The good part
 
-And then, in the project's root, run
+Since we run `poetry run` in the Container entrypoint, it is not needed to activate the virtual environment to run commands in the Container.
+
+Since we use bind volumes in the compose file, the Container immediately sees when a new file is added to the host machine, and copies it to the Container. It also copies the files created in the Container to the host Machine, creating a fast environment for developing. Adding a different user to the Container, instead of the normal root one, is to allow the files copied from the Container to the host machine to have the same owner.
+
+Since we use a volume for the virtual environment, when the Container is killed, we can immediately bring it back up just by having it's Image, only needing to install the dependencies once.
+
+And the most valuable part is that to run a development environment like this, you just need Docker and Docker Compose installed, because a Container runs **independent** of the environment or host machine.
+
+### The bad part
+
+Since there is the Docker layer for running the APP, it will be slower then running natively. But sometimes, you don't even see the difference.
+
+It will take more space in the host machine (because of the bind Volume, the project size is duplicated, when running it).
+
+Integration with IDEs will not work. Since IDEs need the virtual environment for plugins to work, coping the virtual environment from the Container to the host machine will not make them work.
+
+But if that's not a problem, removing the necessity of the developers to install the project tools (only needing to Install Docker and Docker Compose to run it), can overcome the downsides.
+
+### running
+
+In the project's root, run
 ```
 docker-compose --file docker/compose.yaml --project-directory ./ run --rm <service-name>
 ```
