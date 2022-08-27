@@ -18,11 +18,11 @@ A Container is a runnable instance of an **Image**.
 
 ### What is an Image?
 
-An image are the **Read Only** **Layers** of a Container.
+An image is the set of **Read Only** **Layers** of a Container.
 
-### What are Layers?
+### What is a Layer?
 
-Layers are the instructions for creating and running a Container.
+A Layer is a instruction for creating and running a Container.
 
 ### How that works?
 
@@ -184,6 +184,8 @@ And the most valuable part is that to run a development environment like this, y
 Since there is the Docker layer for running the APP, it will be slower then running natively. But sometimes, you don't even see the difference.
 
 It will take more space in the host machine (because of the bind Volume, the project size is duplicated, when running it).
+
+Integration with IDEs will not work. Since IDEs need the virtual environment for plugins to work, coping the virtual environment from the Container to the host machine will not make them work.
 
 But if that's not a problem, removing the necessity of the developers to install the project tools (only needing to Install Docker and Docker Compose to run it), can overcome the downsides.
 
