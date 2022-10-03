@@ -1,9 +1,13 @@
 import sys
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Tuple
 from urllib import request
 import json
 from ..config import POETRY_VERSIONS, PYTHON_VERSIONS, __file__
 from cly.colors import color_text
+
+
+def tag_str_to_tuple(version: str) -> Tuple[int, int]:
+    return tuple(map(int, version.split(".", maxsplit=1)))
 
 
 def get_updates(
@@ -43,7 +47,7 @@ def get_updates(
         else:
             tags_serialized[major_and_minor] = [int(patch)]
 
-    return [
+    patch_errors = [
         print(color_text(
             f"Add {name} version {version}.{patch} to project "
             f"{name.upper()}_VERSIONS in {__file__}",
@@ -56,6 +60,20 @@ def get_updates(
         )
         if patch not in versions[version]
     ]
+    major_and_minor_errors = [
+        print(color_text(
+            f"Add {name} version {tag} to project "
+            f"{name.upper()}_VERSIONS in {__file__}",
+            "red"
+            ), file=sys.stderr)
+        for tag in tags_serialized
+        if tag_str_to_tuple(tag) > max(
+            tag_str_to_tuple(version) for version in versions
+        )
+    ]
+
+    return patch_errors + major_and_minor_errors
+
 
 def check_updates(poetry: bool = False, python: bool = False) -> None:
     """
