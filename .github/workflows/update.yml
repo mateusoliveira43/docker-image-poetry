@@ -1,0 +1,20 @@
+name: Check for Updates
+
+on:
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron:  '0 5 * * *' # Every day at 05:00 UTC
+
+jobs:
+  check-for-updates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check if Poetry has updates
+        run: ./scripts/generate.py update --poetry
+
+      - name: Check if Python Docker Image has updates
+        run: ./scripts/generate.py update --python
