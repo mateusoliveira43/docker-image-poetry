@@ -16,7 +16,7 @@ jobs:
       - name: Generate jobs
         id: generate-jobs
         run: |
-          matrix=$(./scripts/generate.py cd)
+          matrix=$(./scripts/pipeline.py cd)
           echo "::set-output name=matrix::$matrix"
 
   docker-hub:
@@ -35,9 +35,8 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build --no-cache ${{ matrix.tags }} - <<< $(./scripts/generate.py cd_dockerfile -v ${{ matrix.version }})
-
+          dockerfile=$(./scripts/pipeline.py dockerfiles -v ${{ matrix.version }})
+          docker build --no-cache ${{ matrix.tags }} - <<< $dockerfile
 
       - name: Push Docker image
         run: docker push --all-tags mateusoliveira43/poetry
-
