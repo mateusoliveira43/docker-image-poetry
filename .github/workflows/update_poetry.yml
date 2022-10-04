@@ -1,0 +1,16 @@
+name: Update Poetry versions
+
+on:
+  schedule:
+    - cron:  '0 7 * * *' # Every day at 07:00 UTC
+
+jobs:
+  check-for-updates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.ACTIONS_TOKEN }}
+
+      - name: Update Poetry
+        run: ./scripts/pipeline.py update --poetry

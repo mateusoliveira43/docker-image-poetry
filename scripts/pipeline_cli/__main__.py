@@ -4,15 +4,16 @@ from cly import config
 
 from . import __version__
 from .commands.cd_jobs import generate_cd_jobs
-from .commands.check_updates import check_updates
 from .commands.ci_jobs import generate_ci_jobs
 from .commands.dockerfiles import generate_dockerfiles
+from .commands.update import update
 
 CLI_CONFIG = {
     "name": "Generator",
     "description": (
         "Generates Dockerfiles, jobs for Continuos Integration "
-        "and Continuos Delivery pipelines and check for updates."
+        "and Continuos Delivery pipelines and updates project to "
+        "include latest Python Docker Image and Poetry versions."
     ),
     "epilog": "Docker Image with Poetry",
     "version": __version__,
@@ -26,8 +27,8 @@ dockerfile_command = CLI.create_command(
 dockerfile_command.add_argument("-v", "--version", metavar="str", type=str)
 CLI.create_command(generate_ci_jobs, alias="ci")
 CLI.create_command(generate_cd_jobs, alias="cd")
-get_updates_command = CLI.create_command(check_updates, alias="update")
-group = get_updates_command.add_mutually_exclusive_group(required=True)
+update_command = CLI.create_command(update)
+group = update_command.add_mutually_exclusive_group(required=True)
 group.add_argument(
     "--poetry",
     action="store_true",
