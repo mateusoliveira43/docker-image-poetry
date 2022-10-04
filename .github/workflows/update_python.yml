@@ -1,9 +1,6 @@
-name: Check for Updates
+name: Update Python Docker Image versions
 
 on:
-  pull_request:
-    branches:
-      - main
   schedule:
     - cron:  '0 5 * * *' # Every day at 05:00 UTC
 
@@ -12,9 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.ACTIONS_TOKEN }}
 
-      - name: Check if Poetry has updates
-        run: ./scripts/pipeline.py update --poetry
-
-      - name: Check if Python Docker Image has updates
+      - name: Update Python Docker Image
         run: ./scripts/pipeline.py update --python
