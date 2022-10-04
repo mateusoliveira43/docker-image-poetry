@@ -38,6 +38,5 @@ jobs:
           dockerfile=$(./scripts/pipeline.py dockerfiles -v ${{ matrix.version }})
           docker build --no-cache ${{ matrix.tags }} - <<< $dockerfile
 
-
       - name: Push Docker image
         run: docker push --all-tags mateusoliveira43/poetry
