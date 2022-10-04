@@ -18,7 +18,7 @@ jobs:
 
       - name: Check if Dockerfiles were generated
         run: |
-          ./scripts/generate.py dockerfiles
+          ./scripts/pipeline.py dockerfiles
           test -z "$(git status --short)"
 
   generate-docker-jobs:
@@ -31,7 +31,7 @@ jobs:
       - name: Generate jobs
         id: generate-jobs
         run: |
-          matrix=$(./scripts/generate.py ci)
+          matrix=$(./scripts/pipeline.py ci)
           echo "::set-output name=matrix::$matrix"
 
   docker-check:
@@ -58,3 +58,49 @@ jobs:
         with:
           image: mateusoliveira43/poetry:${{ matrix.version }}
           args: --severity-threshold=medium --file=${{ matrix.dockerfile }}
+
+  python-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+          cache: "pip"
+          cache-dependency-path: "requirements/*.txt"
+
+      - name: Install Python dependencies
+        run: |
+          pip install -r requirements/dev.txt
+          pip install -e .
+
+      # - name: Python test and coverage
+      #   run: pytest
+
+      # - name: Save html coverage report
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: html-coverage-report
+      #     path: tests/coverage-results/htmlcov/
+
+      - name: Python type check
+        run: mypy .
+
+      - name: Python linter
+        run: dev lint
+
+      - name: Python Code format
+        run: dev format --check
+
+      - name: Code format
+        run: ec -verbose
+
+      - name: Security vulnerability scan in Python code
+        run: dev scan --code
+
+      - name: Security vulnerability scan in Python dependencies
+        run: dev scan --dependencies
+
+      # - name: Test documentation
+      #   run: dev doc --check

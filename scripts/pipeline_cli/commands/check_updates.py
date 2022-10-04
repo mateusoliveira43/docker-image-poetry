@@ -1,13 +1,52 @@
-import sys
-from typing import List, Dict, Optional, Tuple
-from urllib import request
+"""Check for Python and Poetry updates command."""
+
 import json
-from ..config import POETRY_VERSIONS, PYTHON_VERSIONS, __file__
+import sys
+from functools import partial
+from typing import Dict, List, Optional, Tuple
+from urllib import request
+
 from cly.colors import color_text
+
+from ..config import POETRY_VERSIONS, PYTHON_VERSIONS, __file__
 
 
 def tag_str_to_tuple(version: str) -> Tuple[int, int]:
-    return tuple(map(int, version.split(".", maxsplit=1)))
+    """
+    Convert tag string to tuple of integers.
+
+    Parameters
+    ----------
+    version : str
+        Major and Minor versions of the software.
+
+    Returns
+    -------
+    Tuple[int, int]
+        Major and Minor versions converted.
+
+    """
+    return tuple(map(int, version.split(".", maxsplit=1)))  # type: ignore
+
+
+def patch_is_highest(patch: int, patches: List[int]) -> bool:
+    """
+    Check if patch version of software is the highest.
+
+    Parameters
+    ----------
+    patch : int
+        Patch version to analyze.
+    patches : List[int]
+        List of Patch versions of the software.
+
+    Returns
+    -------
+    bool
+        True if it is the highest version; False otherwise.
+
+    """
+    return patch >= min(patches)
 
 
 def get_updates(
@@ -39,7 +78,7 @@ def get_updates(
         and all(label.isdigit() for label in tag.split(".", maxsplit=2))
     ]
 
-    tags_serialized = {}
+    tags_serialized: Dict[str, List[int]] = {}
     for tag in tags_without_pre_releases:
         major_and_minor, patch = tag.rsplit(".", maxsplit=1)
         if tags_serialized.get(major_and_minor):
@@ -48,28 +87,34 @@ def get_updates(
             tags_serialized[major_and_minor] = [int(patch)]
 
     patch_errors = [
-        print(color_text(
-            f"Add {name} version {version}.{patch} to project "
-            f"{name.upper()}_VERSIONS in {__file__}",
-            "red"
-            ), file=sys.stderr)
-        for version in versions
+        print(
+            color_text(
+                f"Add {name} version {version}.{patch} to project "
+                f"{name.upper()}_VERSIONS in {__file__}",
+                "red",
+            ),
+            file=sys.stderr,
+        )
+        for version, patches in versions.items()
         for patch in filter(
-            lambda patch: patch >= min(versions[version]),
-            tags_serialized[version]
+            partial(patch_is_highest, patches=patches),
+            tags_serialized[version],
         )
-        if patch not in versions[version]
+        if patch not in patches
     ]
+
     major_and_minor_errors = [
-        print(color_text(
-            f"Add {name} version {tag} to project "
-            f"{name.upper()}_VERSIONS in {__file__}",
-            "red"
-            ), file=sys.stderr)
-        for tag in tags_serialized
-        if tag_str_to_tuple(tag) > max(
-            tag_str_to_tuple(version) for version in versions
+        print(
+            color_text(
+                f"Add {name} version {tag} to project "
+                f"{name.upper()}_VERSIONS in {__file__}",
+                "red",
+            ),
+            file=sys.stderr,
         )
+        for tag in tags_serialized
+        if tag_str_to_tuple(tag)
+        > max(tag_str_to_tuple(version) for version in versions)
     ]
 
     return patch_errors + major_and_minor_errors
@@ -93,25 +138,26 @@ def check_updates(poetry: bool = False, python: bool = False) -> None:
 
     """
     if poetry:
-        response = request.urlopen(
+        with request.urlopen(  # nosec
             "https://api.github.com/repos/python-poetry/poetry/tags"
-        )
-        tags = [info["name"] for info in json.load(response)]
-        errors = get_updates(tags, POETRY_VERSIONS, "Poetry")
+        ) as response:
+            tags = [info["name"] for info in json.load(response)]
+            errors = get_updates(tags, POETRY_VERSIONS, "Poetry")
 
     if python:
-        token = json.load(request.urlopen(
+        with request.urlopen(  # nosec
             "https://auth.docker.io/token"
             "?service=registry.docker.io"
             "&scope=repository:library/python:pull"
-        ))["token"]
+        ) as token_response:
+            token = json.load(token_response)["token"]
         python_docker_image = request.Request(
             "https://index.docker.io/v2/library/python/tags/list"
         )
         python_docker_image.add_header("Authorization", f"Bearer {token}")
-        response = request.urlopen(python_docker_image)
-        tags = [tag for tag in json.load(response)["tags"]]
-        errors = get_updates(tags, PYTHON_VERSIONS, "Python")
+        with request.urlopen(python_docker_image) as response:  # nosec
+            tags = list(json.load(response)["tags"])
+            errors = get_updates(tags, PYTHON_VERSIONS, "Python")
 
     if errors:
         raise SystemExit(len(errors))
