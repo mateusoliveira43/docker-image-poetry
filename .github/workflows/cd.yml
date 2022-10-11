@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - templates/**
-      - scripts/config.py
+      - scripts/pipeline_cli/config.py
       # - .github/workflows/cd.yml
 
 jobs:

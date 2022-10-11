@@ -9,8 +9,7 @@ on:
       - main
     paths:
       - templates/**
-      - scripts/config.py
-      # - .github/workflows/cd.yml
+      - scripts/pipeline_cli/config.py
   schedule:
     - cron:  '0 0 * * 1' # Every Monday at 00:00 UTC
 
