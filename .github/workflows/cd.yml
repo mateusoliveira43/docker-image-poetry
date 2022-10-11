@@ -7,7 +7,6 @@ on:
     paths:
       - templates/**
       - scripts/pipeline_cli/config.py
-      # - .github/workflows/cd.yml
 
 jobs:
   generate-jobs:
