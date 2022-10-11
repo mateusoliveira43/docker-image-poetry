@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+    paths:
+      - templates/**
+      - scripts/config.py
+      # - .github/workflows/cd.yml
 
 jobs:
   generate-jobs:
