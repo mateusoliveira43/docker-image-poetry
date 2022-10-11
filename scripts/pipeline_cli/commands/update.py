@@ -175,7 +175,7 @@ def update_software_versions(
         [(PROJECT_ROOT / "./scripts/pipeline.py").as_posix(), "dockerfiles"]
     )
     run_command(["git", "add", "--all"])
-    run_command(["git", "commit", "-m", f"⬆ Update {software} versions"])
+    run_command(["git", "commit", "-m", f'"⬆ Update {software} versions"'])
     run_command(["git", "push"])
 
     print(color_text(f"{software} versions updated successfully", "green"))
