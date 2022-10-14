@@ -18,6 +18,7 @@ PYTHON_VERSIONS: Dict[str, List[int]] = {
     "3.10": [
         6,
         7,
+        8,
     ],
 }
 PYTHON_VARIATIONS: Dict[str, List[str]] = {
