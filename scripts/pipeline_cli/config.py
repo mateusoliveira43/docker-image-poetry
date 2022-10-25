@@ -20,6 +20,9 @@ PYTHON_VERSIONS: Dict[str, List[int]] = {
         7,
         8,
     ],
+    "3.11": [
+        0,
+    ],
 }
 PYTHON_VARIATIONS: Dict[str, List[str]] = {
     "bullseye": ["", "-bullseye"],
