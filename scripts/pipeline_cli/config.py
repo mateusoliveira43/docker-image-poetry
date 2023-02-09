@@ -25,10 +25,12 @@ PYTHON_VERSIONS: Dict[str, List[int]] = {
         7,
         8,
         9,
+        10,
     ],
     "3.11": [
         0,
         1,
+        2,
     ],
 }
 PYTHON_VARIATIONS: Dict[str, List[str]] = {
