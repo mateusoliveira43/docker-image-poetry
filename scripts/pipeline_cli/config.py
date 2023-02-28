@@ -18,6 +18,9 @@ POETRY_VERSIONS: Dict[str, List[int]] = {
         1,
         2,
     ],
+    "1.4": [
+        0,
+    ],
 }
 PYTHON_VERSIONS: Dict[str, List[int]] = {
     "3.10": [
