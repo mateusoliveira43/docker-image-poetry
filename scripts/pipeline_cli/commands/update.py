@@ -149,7 +149,7 @@ def update_software_versions(
     new_versions_content[software] = [
         f"{version[0]}.{version[1]}.{version[2]}" for version in updates
     ]
-    NEW_VERSIONS_FILE.write_text(json.dumps(new_versions_content))
+    NEW_VERSIONS_FILE.write_text(json.dumps(new_versions_content) + "\n")
     for major, minor, patch in updates:
         major_and_minor = f"{major}.{minor}"
         print(f"{TAB}Adding {software} version {major_and_minor}.{patch}")
