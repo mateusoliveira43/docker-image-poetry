@@ -3,7 +3,12 @@
 import json
 from typing import Dict, List
 
-from ..config import POETRY_VERSIONS, PYTHON_VARIATIONS, PYTHON_VERSIONS
+from ..config import (
+    NEW_VERSIONS_FILE,
+    POETRY_VERSIONS,
+    PYTHON_VARIATIONS,
+    PYTHON_VERSIONS,
+)
 from . import get_dockerfile_version
 
 
@@ -82,28 +87,29 @@ def get_tags(
     )
 
 
-jobs = [
-    {
-        "version": (
-            f"{poetry_minor}.{poetry_patch}-python"
-            f"{python_minor}.{python_patch}-{variation}"
-        ),
-        "tags": get_tags(
-            poetry_minor=poetry_minor,
-            poetry_patch=poetry_patch,
-            python_minor=python_minor,
-            python_patch=python_patch,
-            variation=variation,
-        ),
-    }
-    for poetry_minor, poetry_patches in POETRY_VERSIONS.items()
-    for poetry_patch in poetry_patches
-    for python_minor, python_patches in PYTHON_VERSIONS.items()
-    for python_patch in python_patches
-    for variation in PYTHON_VARIATIONS
-]
-
-
 def generate_cd_jobs() -> None:
     """Generate jobs for the Continuos Delivery pipeline."""
+    new_versions_content = json.loads(NEW_VERSIONS_FILE.read_text())
+    jobs = [
+        {
+            "version": (
+                f"{poetry_minor}.{poetry_patch}-python"
+                f"{python_minor}.{python_patch}-{variation}"
+            ),
+            "tags": get_tags(
+                poetry_minor=poetry_minor,
+                poetry_patch=poetry_patch,
+                python_minor=python_minor,
+                python_patch=python_patch,
+                variation=variation,
+            ),
+        }
+        for poetry_minor, poetry_patches in POETRY_VERSIONS.items()
+        for poetry_patch in poetry_patches
+        for python_minor, python_patches in PYTHON_VERSIONS.items()
+        for python_patch in python_patches
+        for variation in PYTHON_VARIATIONS
+        if f"{poetry_minor}.{poetry_patch}" in new_versions_content["Poetry"]
+        or f"{python_minor}.{python_patch}" in new_versions_content["Python"]
+    ]
     print(json.dumps({"include": jobs}))

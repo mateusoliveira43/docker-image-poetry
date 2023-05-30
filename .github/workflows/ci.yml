@@ -32,7 +32,7 @@ jobs:
         id: generate-jobs
         run: |
           matrix=$(./scripts/pipeline.py ci)
-          echo "::set-output name=matrix::$matrix"
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
 
   docker-check:
     needs: [project-check, generate-docker-jobs]

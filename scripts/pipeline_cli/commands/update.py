@@ -3,13 +3,19 @@
 import json
 from functools import partial
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Tuple
 from urllib import request
 
 from cly.colors import color_text
 from cly.utils import run_command
 
-from ..config import POETRY_VERSIONS, PROJECT_ROOT, PYTHON_VERSIONS, __file__
+from ..config import (
+    NEW_VERSIONS_FILE,
+    POETRY_VERSIONS,
+    PROJECT_ROOT,
+    PYTHON_VERSIONS,
+    __file__,
+)
 
 TAB = " " * 4
 
@@ -54,7 +60,7 @@ def patch_is_highest(patch: int, patches: List[int]) -> bool:
 
 def get_updates(
     tags: List[str], versions: Dict[str, List[int]]
-) -> List[Optional[Tuple[int, int, int]]]:
+) -> List[Tuple[int, int, int]]:
     """
     Get available updates from tags, looking to project versions.
 
@@ -67,7 +73,7 @@ def get_updates(
 
     Returns
     -------
-    List[Optional[Tuple[int, int, int]]]
+    List[Tuple[int, int, int]]
         Empty list, if there are no updates to be made; else, a list with the
         available versions for update.
 
@@ -87,7 +93,7 @@ def get_updates(
         else:
             tags_serialized[major_and_minor] = [int(patch)]
 
-    patch_errors = [
+    patch_updates = [
         (*tag_str_to_tuple(version), patch)
         for version, patches in versions.items()
         for patch in filter(
@@ -97,7 +103,7 @@ def get_updates(
         if patch not in patches
     ]
 
-    major_and_minor_errors = [
+    major_and_minor_updates = [
         (*tag_str_to_tuple(tag), patch)
         for tag, patches in tags_serialized.items()
         for patch in patches
@@ -105,12 +111,12 @@ def get_updates(
         > max(tag_str_to_tuple(version) for version in versions)
     ]
 
-    return sorted(patch_errors + major_and_minor_errors)  # type: ignore
+    return sorted(patch_updates + major_and_minor_updates)
 
 
 def update_software_versions(
     software: str,
-    updates: List[Optional[Tuple[int, int, int]]],
+    updates: List[Tuple[int, int, int]],
     versions: Dict[str, List[int]],
 ) -> None:
     """
@@ -120,7 +126,7 @@ def update_software_versions(
     ----------
     software : str
         The software to update (Poetry or Python).
-    updates : List[Optional[Tuple[int, int, int]]]
+    updates : List[Tuple[int, int, int]]
         List of available updates for the software.
     versions : Dict[str, List[int]]
         Project versions of the software.
@@ -139,8 +145,12 @@ def update_software_versions(
         )
         + 1
     )
-    for version in updates:
-        major, minor, patch = version  # type: ignore
+    new_versions_content: Dict[str, List[str]] = {"Poetry": [], "Python": []}
+    new_versions_content[software] = [
+        f"{version[0]}.{version[1]}.{version[2]}" for version in updates
+    ]
+    NEW_VERSIONS_FILE.write_text(json.dumps(new_versions_content) + "\n")
+    for major, minor, patch in updates:
         major_and_minor = f"{major}.{minor}"
         print(f"{TAB}Adding {software} version {major_and_minor}.{patch}")
         if major_and_minor in versions:

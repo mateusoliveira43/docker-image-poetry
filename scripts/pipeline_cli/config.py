@@ -51,3 +51,4 @@ PYTHON_VARIATIONS: Dict[str, List[str]] = {
 
 PROJECT_ROOT: Path = Path(__file__).resolve().parent.parent.parent
 TEMPLATE_FOLDER: Path = PROJECT_ROOT / "templates"
+NEW_VERSIONS_FILE = PROJECT_ROOT / ".github/new_versions.json"
